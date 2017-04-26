@@ -62,4 +62,9 @@ public class GameManager : MonoBehaviour {
             }
         }
     }
+
+    public void QuitToDesktop()
+    {
+        Application.Quit();
+    }
 }

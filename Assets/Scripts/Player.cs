@@ -7,9 +7,9 @@ using Spine.Unity;
 public class Player : MonoBehaviour {
 
     // constatnts
-    const float kPushSpeed = 36.0f;
-    const float kMinSpeed = 8.0f;
-    const float kOlliePower = 25.0f;
+    const float kPushSpeed = 40.0f;
+    const float kMinSpeed = 14.0f;
+    const float kOlliePower = 22.0f;
     const float kTimeBetweenPushes = 1.0f;
 
     // public 
