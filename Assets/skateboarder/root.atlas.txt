@@ -1,26 +1,26 @@
 
 root.png
-size: 512,128
+size: 1024,128
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 skateparts/ skatedude-01
   rotate: true
-  xy: 258, 13
+  xy: 952, 25
   size: 32, 70
   orig: 32, 70
   offset: 0, 0
   index: -1
 skateparts/ skatedude-02
   rotate: false
-  xy: 457, 95
+  xy: 469, 10
   size: 41, 29
   orig: 41, 29
   offset: 0, 0
   index: -1
 skateparts/ skatedude-03
   rotate: true
-  xy: 158, 28
+  xy: 635, 21
   size: 24, 98
   orig: 24, 98
   offset: 0, 0
@@ -41,63 +41,63 @@ skateparts/ skatedude-05
   index: -1
 skateparts/ skatedude-06
   rotate: true
-  xy: 398, 10
+  xy: 404, 8
   size: 31, 63
   orig: 31, 63
   offset: 0, 0
   index: -1
 skateparts/ skatedude-07
   rotate: true
-  xy: 358, 43
+  xy: 735, 25
   size: 20, 79
   orig: 20, 79
   offset: 0, 0
   index: -1
 skateparts/ skatedude-08
   rotate: true
-  xy: 439, 43
+  xy: 816, 25
   size: 20, 42
   orig: 20, 42
   offset: 0, 0
   index: -1
 skateparts/ skatedude-09
   rotate: true
-  xy: 158, 54
+  xy: 866, 92
   size: 32, 116
   orig: 32, 116
   offset: 0, 0
   index: -1
 skateparts/ skatedude-10
   rotate: true
-  xy: 336, 65
+  xy: 870, 59
   size: 31, 111
   orig: 31, 111
   offset: 0, 0
   index: -1
 skateparts/ skatedude-11
   rotate: true
-  xy: 276, 47
+  xy: 870, 41
   size: 16, 80
   orig: 16, 80
   offset: 0, 0
   index: -1
 skateparts/ skatedude-12
   rotate: true
-  xy: 449, 66
+  xy: 984, 97
   size: 27, 38
   orig: 27, 38
   offset: 0, 0
   index: -1
 skateparts/ skatedude-13
   rotate: true
-  xy: 330, 10
+  xy: 336, 8
   size: 31, 66
   orig: 31, 66
   offset: 0, 0
   index: -1
 skateparts/ skatedude-14
   rotate: true
-  xy: 336, 98
+  xy: 514, 19
   size: 26, 119
   orig: 26, 119
   offset: 0, 0
@@ -111,22 +111,71 @@ skateparts/ skatedude-15
   index: -1
 skateparts/ skatedude-16
   rotate: false
-  xy: 276, 65
+  xy: 860, 18
   size: 54, 21
   orig: 54, 21
   offset: 0, 0
   index: -1
 skateparts/ skatedude-17
-  rotate: true
-  xy: 132, 17
+  rotate: false
+  xy: 916, 17
   size: 30, 22
   orig: 30, 22
   offset: 0, 0
   index: -1
 skateparts/ skatedude-18
   rotate: false
-  xy: 158, 88
+  xy: 158, 40
   size: 176, 36
   orig: 176, 36
+  offset: 0, 0
+  index: -1
+skateparts/ skatedude-20
+  rotate: false
+  xy: 512, 84
+  size: 175, 40
+  orig: 175, 40
+  offset: 0, 0
+  index: -1
+skateparts/ skatedude-21
+  rotate: false
+  xy: 335, 79
+  size: 175, 45
+  orig: 175, 45
+  offset: 0, 0
+  index: -1
+skateparts/ skatedude-22
+  rotate: false
+  xy: 689, 84
+  size: 175, 40
+  orig: 175, 40
+  offset: 0, 0
+  index: -1
+skateparts/ skatedude-23
+  rotate: false
+  xy: 336, 41
+  size: 176, 36
+  orig: 176, 36
+  offset: 0, 0
+  index: -1
+skateparts/ skatedude-24
+  rotate: false
+  xy: 514, 47
+  size: 176, 35
+  orig: 176, 35
+  offset: 0, 0
+  index: -1
+skateparts/ skatedude-25
+  rotate: false
+  xy: 158, 78
+  size: 175, 46
+  orig: 175, 46
+  offset: 0, 0
+  index: -1
+skateparts/ skatedude-26
+  rotate: false
+  xy: 692, 47
+  size: 176, 35
+  orig: 176, 35
   offset: 0, 0
   index: -1
