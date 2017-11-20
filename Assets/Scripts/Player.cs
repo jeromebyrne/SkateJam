@@ -7,11 +7,11 @@ using Spine.Unity;
 public class Player : MonoBehaviour {
 
     // constatnts
-    const float kPushSpeed =1.1f;
+    const float kPushSpeed =0.8f;
     const float kMinSpeed = 8.0f;
-    const float kMaxSpeed = 35.0f;
+    const float kMaxSpeed = 40.0f;
     const float kOlliePower = 22.0f;
-    const float kTimeBetweenPushes = 1.5f;
+    const float kTimeBetweenPushes = 1.25f;
 
     // public 
     public SkeletonAnimation m_SkeletonAnim;
@@ -134,21 +134,32 @@ public class Player : MonoBehaviour {
         UpdateCenterOfMass();
         UpdateBoundingBox();
 
-        if (m_NumWheelsOnGround > 0 && !m_OllieAudio.isPlaying)
+        if (m_NumWheelsOnGround > 0 && !m_OllieAudio.isPlaying && m_RigidBody.velocity.x > 0.0f && !m_ragdollEnabled)
         {
             m_OllieAudio.Stop();
             m_OllieAudio.clip = m_RollAudio;
             m_OllieAudio.loop = true;
             m_OllieAudio.Play();
+        
         }
-        else if (m_NumWheelsOnGround == 0)
+        else if (m_NumWheelsOnGround > 0 && m_OllieAudio.isPlaying && !m_ragdollEnabled)
         {
-            /*
-            if (m_OllieAudio.clip.name == "roll")
+            // set the speed based on the velocity of the player
+            float percent = m_RigidBody.velocity.x / kMaxSpeed;
+
+            if (percent < 0.5f)
+            {
+                percent = 0.5f;
+            }
+
+            m_OllieAudio.pitch = percent;
+        }
+        else if (m_NumWheelsOnGround == 0 || m_RigidBody.velocity.x <= 0.0f || m_ragdollEnabled)
+        {
+            if (m_OllieAudio.clip.name == "rolling")
             {
                 m_OllieAudio.Stop();
             }
-            */
         }
 
         if (m_IsCrouching)
@@ -178,6 +189,7 @@ public class Player : MonoBehaviour {
 
         int randIndex = Random.Range(0, m_RandomBailClips.Length - 1);
         m_OllieAudio.clip = m_RandomBailClips[randIndex];
+        m_OllieAudio.pitch = 1.0f;
         m_OllieAudio.loop = false;
         m_OllieAudio.Play();
     }

@@ -23,7 +23,7 @@ public class CameraControl : MonoBehaviour {
         if (m_Player) 
         {
             // Vector3 newPos = new Vector3(m_Player.transform.position.x, m_Camera.transform.position.y, m_Camera.transform.position.z);
-            Vector3 newPos = new Vector3(m_Player.transform.position.x + 20.0f, m_Player.transform.position.y + 7.0f, m_Camera.transform.position.z);
+            Vector3 newPos = new Vector3(m_Player.transform.position.x + 25.0f, m_Player.transform.position.y + 7.0f, m_Camera.transform.position.z);
             m_Camera.transform.position = newPos;
         }        
 	}
