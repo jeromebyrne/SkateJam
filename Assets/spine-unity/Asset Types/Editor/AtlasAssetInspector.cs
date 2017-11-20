@@ -52,7 +52,7 @@ namespace Spine.Unity.Editor {
 				if (spriteSlicesLabel == null) {
 					spriteSlicesLabel = new GUIContent(
 						"Apply Regions as Texture Sprite Slices",
-						SpineEditorUtilities.Icons.unityIcon,
+						SpineEditorUtilities.Icons.unity,
 						"Adds Sprite slices to atlas texture(s). " +
 						"Updates existing slices if ones with matching names exist. \n\n" +
 						"If your atlas was exported with Premultiply Alpha, " +
@@ -120,7 +120,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			if (materials.arraySize == 0) {
-				EditorGUILayout.LabelField(new GUIContent("Error:  Missing materials", SpineEditorUtilities.Icons.warning));
+				EditorGUILayout.HelpBox("No materials", MessageType.Error);
 				return;
 			}
 
@@ -128,9 +128,18 @@ namespace Spine.Unity.Editor {
 				SerializedProperty prop = materials.GetArrayElementAtIndex(i);
 				Material mat = (Material)prop.objectReferenceValue;
 				if (mat == null) {
-					EditorGUILayout.LabelField(new GUIContent("Error:  Materials cannot be null", SpineEditorUtilities.Icons.warning));
+					EditorGUILayout.HelpBox("Materials cannot be null.", MessageType.Error);
 					return;
 				}
+			}
+
+			EditorGUILayout.Space();
+			if (SpineInspectorUtility.LargeCenteredButton(SpineInspectorUtility.TempContent("Set Mipmap Bias to " + SpineEditorUtilities.DEFAULT_MIPMAPBIAS))) {
+				foreach (var m in atlasAsset.materials) {
+					var texture = m.mainTexture;
+					texture.mipMapBias = SpineEditorUtilities.DEFAULT_MIPMAPBIAS;
+				}
+				Debug.Log("Texture mipmap bias set to " + SpineEditorUtilities.DEFAULT_MIPMAPBIAS);
 			}
 
 			EditorGUILayout.Space();
@@ -141,6 +150,8 @@ namespace Spine.Unity.Editor {
 						UpdateSpriteSlices(m.mainTexture, atlas);
 				}
 			}
+
+			EditorGUILayout.Space();
 
 			#if REGION_BAKING_MESH
 			if (atlasFile.objectReferenceValue != null) {

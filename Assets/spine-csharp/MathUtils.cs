@@ -55,26 +55,22 @@ namespace Spine {
 
 		/// <summary>Returns the sine in radians from a lookup table.</summary>
 		static public float Sin (float radians) {
-			//return sin[(int)(radians * RadToIndex) & SIN_MASK];
-			return (float)Math.Sin(radians);
+			return sin[(int)(radians * RadToIndex) & SIN_MASK];
 		}
 
 		/// <summary>Returns the cosine in radians from a lookup table.</summary>
 		static public float Cos (float radians) {
-			return (float)Math.Cos(radians);
-			//return sin[(int)((radians + PI / 2) * RadToIndex) & SIN_MASK];
+			return sin[(int)((radians + PI / 2) * RadToIndex) & SIN_MASK];
 		}
 			
 		/// <summary>Returns the sine in radians from a lookup table.</summary>
 		static public float SinDeg (float degrees) {
-			return (float)Math.Sin(degrees * DegRad);
-			//return sin[(int)(degrees * DegToIndex) & SIN_MASK];
+			return sin[(int)(degrees * DegToIndex) & SIN_MASK];
 		}
 			
 		/// <summary>Returns the cosine in radians from a lookup table.</summary>
 		static public float CosDeg (float degrees) {
-			return (float)Math.Cos(degrees * DegRad);
-			//return sin[(int)((degrees + 90) * DegToIndex) & SIN_MASK];
+			return sin[(int)((degrees + 90) * DegToIndex) & SIN_MASK];
 		}
 
 		/// <summary>Returns atan2 in radians, faster but less accurate than Math.Atan2. Average error of 0.00231 radians (0.1323

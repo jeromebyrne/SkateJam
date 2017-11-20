@@ -7,10 +7,11 @@ using Spine.Unity;
 public class Player : MonoBehaviour {
 
     // constatnts
-    const float kPushSpeed = 40.0f;
-    const float kMinSpeed = 14.0f;
+    const float kPushSpeed =1.1f;
+    const float kMinSpeed = 8.0f;
+    const float kMaxSpeed = 35.0f;
     const float kOlliePower = 22.0f;
-    const float kTimeBetweenPushes = 1.0f;
+    const float kTimeBetweenPushes = 1.5f;
 
     // public 
     public SkeletonAnimation m_SkeletonAnim;
@@ -74,15 +75,33 @@ public class Player : MonoBehaviour {
             return;
         }
 
+        PlayAnimation("push", false);
+
+        m_TimeSinceLastPushed = Time.time;
+    }
+
+    private void Accelerate()
+    {
+        if (m_ragdollEnabled)
+        {
+            return;
+        }
+
+        if (m_NumWheelsOnGround == 0)
+        {
+            return;
+        }
+
         if (m_RigidBody)
         {
-            Vector2 newVel = m_RigidBody.transform.right * kPushSpeed;
+            Vector2 newVel = m_RigidBody.velocity + new Vector2 (m_RigidBody.transform.right.x * kPushSpeed, 0.0f);
+
+            if (newVel.x > kMaxSpeed)
+            {
+                newVel.x = kMaxSpeed;
+            }
 
             m_RigidBody.velocity = newVel;
-
-            PlayAnimation("push", false);
-
-            m_TimeSinceLastPushed = Time.time;
         }
     }
 
@@ -142,6 +161,9 @@ public class Player : MonoBehaviour {
             {
                 PushSkateboard();
             }
+
+            // always accelerate if crouching
+            Accelerate();
         }
     }
 

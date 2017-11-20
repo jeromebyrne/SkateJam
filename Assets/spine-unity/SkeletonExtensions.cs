@@ -134,6 +134,38 @@ namespace Spine.Unity {
 			return spineGameObjectTransform.TransformPoint(new Vector3(bone.worldX, bone.worldY));
 		}
 
+		public static Vector3 GetWorldPosition (this Bone bone, UnityEngine.Transform spineGameObjectTransform, float positionScale) {
+			return spineGameObjectTransform.TransformPoint(new Vector3(bone.worldX * positionScale, bone.worldY * positionScale));
+		}
+
+		/// <summary>Gets a skeleton space UnityEngine.Quaternion representation of bone.WorldRotationX.</summary>
+		public static Quaternion GetQuaternion (this Bone bone) {
+			var halfRotation = Mathf.Atan2(bone.c, bone.a) * 0.5f;
+			return new Quaternion(0, 0, Mathf.Sin(halfRotation), Mathf.Cos(halfRotation));
+		}
+
+		/// <summary>Gets a bone-local space UnityEngine.Quaternion representation of bone.rotation.</summary>
+		public static Quaternion GetLocalQuaternion (this Bone bone) {
+			var halfRotation = bone.rotation * Mathf.Deg2Rad * 0.5f;
+			return new Quaternion(0, 0, Mathf.Sin(halfRotation), Mathf.Cos(halfRotation));
+		}
+
+		/// <summary>Gets the PointAttachment's Unity World position using its Spine GameObject Transform.</summary>
+		public static Vector3 GetWorldPosition (this PointAttachment attachment, Slot slot, Transform spineGameObjectTransform) {
+			Vector3 skeletonSpacePosition;
+			skeletonSpacePosition.z = 0;
+			attachment.ComputeWorldPosition(slot.bone, out skeletonSpacePosition.x, out skeletonSpacePosition.y);
+			return spineGameObjectTransform.TransformPoint(skeletonSpacePosition);
+		}
+
+		/// <summary>Gets the PointAttachment's Unity World position using its Spine GameObject Transform.</summary>
+		public static Vector3 GetWorldPosition (this PointAttachment attachment, Bone bone, Transform spineGameObjectTransform) {
+			Vector3 skeletonSpacePosition;
+			skeletonSpacePosition.z = 0;
+			attachment.ComputeWorldPosition(bone, out skeletonSpacePosition.x, out skeletonSpacePosition.y);
+			return spineGameObjectTransform.TransformPoint(skeletonSpacePosition);
+		}
+
 		/// <summary>Gets the internal bone matrix as a Unity bonespace-to-skeletonspace transformation matrix.</summary>
 		public static Matrix4x4 GetMatrix4x4 (this Bone bone) {
 			return new Matrix4x4 {
@@ -158,6 +190,20 @@ namespace Spine.Unity {
 			Vector2 o;
 			bone.WorldToLocal(worldPosition.x, worldPosition.y, out o.x, out o.y);
 			return o;
+		}
+
+		/// <summary>Sets the skeleton-space position of a bone.</summary>
+		/// <returns>The local position in its parent bone space, or in skeleton space if it is the root bone.</returns>
+		public static Vector2 SetPositionSkeletonSpace (this Bone bone, Vector2 skeletonSpacePosition) {
+			if (bone.parent == null) { // root bone
+				bone.SetPosition(skeletonSpacePosition);
+				return skeletonSpacePosition;
+			} else {
+				var parent = bone.parent;
+				Vector2 parentLocal = parent.WorldToLocal(skeletonSpacePosition);
+				bone.SetPosition(parentLocal);
+				return parentLocal;
+			}
 		}
 		#endregion
 
@@ -248,6 +294,10 @@ namespace Spine {
 			return va.bones != null && va.bones.Length > 0;
 		}
 
+		public static bool IsRenderable (this Attachment a) {
+			return a is RegionAttachment || a is MeshAttachment;
+		}
+
 		#region Transform Modes
 		public static bool InheritsRotation (this TransformMode mode) {
 			const int RotationBit = 0;
@@ -261,11 +311,6 @@ namespace Spine {
 		#endregion
 
 		#region Posing
-		[System.Obsolete("Old Animation.Apply method signature. Please use the 8 parameter signature. See summary to learn about the extra arguments.")]
-		public static void Apply (this Spine.Animation animation, Skeleton skeleton, float lastTime, float time, bool loop, ExposedList<Event> events) {
-			animation.Apply(skeleton, lastTime, time, loop, events, 1f, false, false);
-		}
-
 		internal static void SetPropertyToSetupPose (this Skeleton skeleton, int propertyID) {
 			int tt = propertyID >> 24;
 			var timelineType = (TimelineType)tt;
@@ -304,6 +349,9 @@ namespace Spine {
 			case TimelineType.Color:
 				skeleton.slots.Items[i].SetColorToSetupPose();
 				break;
+			case TimelineType.TwoColor:
+				skeleton.slots.Items[i].SetColorToSetupPose();
+				break;
 			case TimelineType.Deform:
 				skeleton.slots.Items[i].attachmentVertices.Clear();
 				break;
@@ -319,6 +367,8 @@ namespace Spine {
 				ikc.mix = ikc.data.mix;
 				ikc.bendDirection = ikc.data.bendDirection;
 				break;
+
+			// TransformConstraint
 			case TimelineType.TransformConstraint:
 				var tc = skeleton.transformConstraints.Items[i];
 				var tcData = tc.data;
@@ -362,6 +412,9 @@ namespace Spine {
 			slot.g = slot.data.g;
 			slot.b = slot.data.b;
 			slot.a = slot.data.a;
+			slot.r2 = slot.data.r2;
+			slot.g2 = slot.data.g2;
+			slot.b2 = slot.data.b2;
 		}
 
 		/// <summary>Sets a slot's attachment to setup pose. If you have the slotIndex, Skeleton.SetSlotAttachmentToSetupPose is faster.</summary>
@@ -389,17 +442,24 @@ namespace Spine {
 		/// <param name="animationName">The name of the animation to use.</param>
 		/// <param name = "time">The time of the pose within the animation.</param>
 		/// <param name = "loop">Wraps the time around if it is longer than the duration of the animation.</param>
-		public static void PoseWithAnimation (this Skeleton skeleton, string animationName, float time, bool loop) {
+		public static void PoseWithAnimation (this Skeleton skeleton, string animationName, float time, bool loop = false) {
 			// Fail loud when skeleton.data is null.
 			Spine.Animation animation = skeleton.data.FindAnimation(animationName);
 			if (animation == null) return;
-			animation.Apply(skeleton, 0, time, loop, null, 1f, false, false);
+			animation.Apply(skeleton, 0, time, loop, null, 1f, MixPose.Setup, MixDirection.In);
+		}
+
+		/// <summary>Pose a skeleton according to a given time in an animation.</summary>
+		public static void PoseSkeleton (this Animation animation, Skeleton skeleton, float time, bool loop = false) {
+			animation.Apply(skeleton, 0, time, loop, null, 1f, MixPose.Setup, MixDirection.In);
 		}
 
 		/// <summary>Resets Skeleton parts to Setup Pose according to a Spine.Animation's keyed items.</summary>
 		public static void SetKeyedItemsToSetupPose (this Animation animation, Skeleton skeleton) {
-			animation.Apply(skeleton, 0, 0, false, null, 0, true, true);
+			animation.Apply(skeleton, 0, 0, false, null, 0, MixPose.Setup, MixDirection.Out);
 		}
+
+
 		#endregion
 
 		#region Skins

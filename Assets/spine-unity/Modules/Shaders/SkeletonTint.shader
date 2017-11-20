@@ -1,5 +1,3 @@
-// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
 // Spine/Skeleton Tint
 // - Two color tint
 // - unlit
@@ -16,7 +14,6 @@ Shader "Spine/Skeleton Tint" {
 
 	SubShader {
 		Tags { "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
-		LOD 100
 
 		Fog { Mode Off }
 		Cull Off
@@ -28,11 +25,10 @@ Shader "Spine/Skeleton Tint" {
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-			//#pragma multi_compile_fwdbase
 			#include "UnityCG.cginc"
-			uniform sampler2D _MainTex; uniform float4 _MainTex_ST;
-			uniform float4 _Color;
-			uniform float4 _Black;
+			sampler2D _MainTex;
+			float4 _Color;
+			float4 _Black;
 
 			struct VertexInput {
 				float4 vertex : POSITION;
@@ -48,15 +44,15 @@ Shader "Spine/Skeleton Tint" {
 
 			VertexOutput vert (VertexInput v) {
 				VertexOutput o;
-				o.pos = UnityObjectToClipPos(v.vertex);
-				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+				o.pos = UnityObjectToClipPos(v.vertex); // replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+				o.uv = v.uv;
 				o.vertexColor = v.vertexColor * float4(_Color.rgb * _Color.a, _Color.a); // Combine a PMA version of _Color with vertexColor.
 				return o;
 			}
 
 			float4 frag (VertexOutput i) : COLOR {
 				float4 texColor = tex2D(_MainTex, i.uv);
-				return (texColor * i.vertexColor) + float4(((1-texColor.rgb) * texColor.a * _Black.rgb), 0);
+				return (texColor * i.vertexColor) + float4(((1-texColor.rgb) * _Black.rgb * texColor.a*_Color.a*i.vertexColor.a), 0);
 			}
 			ENDCG
 		}
@@ -65,9 +61,12 @@ Shader "Spine/Skeleton Tint" {
 			Name "Caster"
 			Tags { "LightMode"="ShadowCaster" }
 			Offset 1, 1
-
 			ZWrite On
 			ZTest LEqual
+
+			Fog { Mode Off }
+			Cull Off
+			Lighting Off
 
 			CGPROGRAM
 			#pragma vertex vert
@@ -75,24 +74,22 @@ Shader "Spine/Skeleton Tint" {
 			#pragma multi_compile_shadowcaster
 			#pragma fragmentoption ARB_precision_hint_fastest
 			#include "UnityCG.cginc"
-			struct v2f { 
+			sampler2D _MainTex;
+			fixed _Cutoff;
+
+			struct VertexOutput { 
 				V2F_SHADOW_CASTER;
 				float2 uv : TEXCOORD1;
 			};
 
-			uniform float4 _MainTex_ST;
-
-			v2f vert (appdata_base v) {
-				v2f o;
+			VertexOutput vert (appdata_base v) {
+				VertexOutput o;
+				o.uv = v.texcoord;
 				TRANSFER_SHADOW_CASTER(o)
-				o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
 				return o;
 			}
 
-			uniform sampler2D _MainTex;
-			uniform fixed _Cutoff;
-
-			float4 frag (v2f i) : COLOR {
+			float4 frag (VertexOutput i) : COLOR {
 				fixed4 texcol = tex2D(_MainTex, i.uv);
 				clip(texcol.a - _Cutoff);
 				SHADOW_CASTER_FRAGMENT(i)
