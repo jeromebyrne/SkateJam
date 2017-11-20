@@ -136,12 +136,10 @@ public class Player : MonoBehaviour {
 
         if (m_NumWheelsOnGround > 0 && !m_OllieAudio.isPlaying)
         {
-            /*
             m_OllieAudio.Stop();
             m_OllieAudio.clip = m_RollAudio;
             m_OllieAudio.loop = true;
             m_OllieAudio.Play();
-            */
         }
         else if (m_NumWheelsOnGround == 0)
         {
@@ -397,13 +395,13 @@ public class Player : MonoBehaviour {
 
         Vector3 posOffset = new Vector3(0, - 0.4f, 0.0f);
 
-        RaycastHit2D hit = Physics2D.Raycast(m_BackWheel.transform.position + posOffset, -Vector2.up, 0.4f);
+        RaycastHit2D hit = Physics2D.Raycast(m_BackWheel.transform.position + posOffset, -Vector2.up, 1.4f);
         if (hit.collider != null && hit.collider.tag != "Skater")
         {
             m_NumWheelsOnGround++;
         }
 
-        hit = Physics2D.Raycast(m_FrontWheel.transform.position + posOffset, -Vector2.up, 0.4f);
+        hit = Physics2D.Raycast(m_FrontWheel.transform.position + posOffset, -Vector2.up, 1.4f);
         if (hit.collider != null && hit.collider.tag != "Skater")
         {
             m_NumWheelsOnGround++;
