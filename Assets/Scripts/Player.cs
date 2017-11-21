@@ -8,10 +8,12 @@ public class Player : MonoBehaviour {
 
     // constatnts
     const float kPushSpeed =0.8f;
+    const float kPushSpeedGrinding = 2.0f;
     const float kMinSpeed = 8.0f;
     const float kMaxSpeed = 40.0f;
-    const float kOlliePower = 22.0f;
-    const float kTimeBetweenPushes = 1.25f;
+    const float kMaxSpeedGrinding = 50.0f;
+    const float kOlliePower = 23.0f;
+    const float kTimeBetweenPushes = 1.5f;
 
     // public 
     public SkeletonAnimation m_SkeletonAnim;
@@ -22,6 +24,7 @@ public class Player : MonoBehaviour {
     public AudioClip[] m_RandomOllieClips;
     public AudioClip[] m_RandomLandClips;
     public AudioClip m_RollAudio;
+    public AudioClip m_railGrindAudio;
     public AudioClip[] m_RandomBailClips;
 
     // private
@@ -31,6 +34,8 @@ public class Player : MonoBehaviour {
     int m_NumWheelsOnGround = 0;
     bool m_IsCrouching = false;
     float m_TimeSinceLastPushed = 0.0f;
+    CameraShake m_cameraShake = null;
+    bool m_isGrinding = false;
 
     public bool AnyWheelsOnGround()
     {
@@ -61,6 +66,7 @@ public class Player : MonoBehaviour {
         m_SkeletonAnim = GetComponent<SkeletonAnimation>();
         ragdoll = GetComponent<Spine.Unity.Modules.SkeletonRagdoll2D>();
         m_RigidBody = GetComponent<Rigidbody2D>();
+        m_cameraShake = Camera.main.GetComponent<CameraShake>();
     }
 
     public void PushSkateboard()
@@ -94,11 +100,13 @@ public class Player : MonoBehaviour {
 
         if (m_RigidBody)
         {
-            Vector2 newVel = m_RigidBody.velocity + new Vector2 (m_RigidBody.transform.right.x * kPushSpeed, 0.0f);
+            float pushSpeed = m_isGrinding ? kPushSpeedGrinding : kPushSpeed;
+            Vector2 newVel = m_RigidBody.velocity + new Vector2 (m_RigidBody.transform.right.x * pushSpeed, 0.0f);
 
-            if (newVel.x > kMaxSpeed)
+            float maxSpeed = m_isGrinding ? kMaxSpeedGrinding : kMaxSpeed;
+            if (newVel.x > maxSpeed)
             {
-                newVel.x = kMaxSpeed;
+                newVel.x = maxSpeed;
             }
 
             m_RigidBody.velocity = newVel;
@@ -109,12 +117,12 @@ public class Player : MonoBehaviour {
     {
         return m_ragdollEnabled;
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    // Update is called once per frame
+    void Update()
     {
         // minimum velocity
-        if (m_RigidBody.transform.up.y > 0.9f && !IsRagdollEnabled() )
+        if (m_RigidBody.transform.up.y > 0.9f && !IsRagdollEnabled())
         {
             if (m_RigidBody.velocity.sqrMagnitude < kMinSpeed * kMinSpeed)
             {
@@ -137,15 +145,40 @@ public class Player : MonoBehaviour {
         if (m_NumWheelsOnGround > 0 && !m_OllieAudio.isPlaying && m_RigidBody.velocity.x > 0.0f && !m_ragdollEnabled)
         {
             m_OllieAudio.Stop();
-            m_OllieAudio.clip = m_RollAudio;
-            m_OllieAudio.loop = true;
+
+            if (m_isGrinding)
+            {
+                m_OllieAudio.clip = m_railGrindAudio;
+                m_OllieAudio.loop = true;
+            }
+            else
+            {
+                m_OllieAudio.clip = m_RollAudio;
+                m_OllieAudio.loop = true;
+            }
+
             m_OllieAudio.Play();
-        
+
         }
         else if (m_NumWheelsOnGround > 0 && m_OllieAudio.isPlaying && !m_ragdollEnabled)
         {
+            if (m_isGrinding)
+            {
+                if (m_OllieAudio.clip.name != "rail_grind")
+                {
+                    m_OllieAudio.Stop();
+                    m_OllieAudio.clip = m_railGrindAudio;
+                    m_OllieAudio.loop = true;
+                    m_OllieAudio.Play();
+                }
+            }
+            else
+            {
+                // TODO: play rolling if grind is playing
+            }
+
             // set the speed based on the velocity of the player
-            float percent = m_RigidBody.velocity.x / kMaxSpeed;
+            float percent = m_RigidBody.velocity.x / (m_isGrinding ? kMaxSpeedGrinding : kMaxSpeed);
 
             if (percent < 0.5f)
             {
@@ -156,7 +189,8 @@ public class Player : MonoBehaviour {
         }
         else if (m_NumWheelsOnGround == 0 || m_RigidBody.velocity.x <= 0.0f || m_ragdollEnabled)
         {
-            if (m_OllieAudio.clip.name == "rolling")
+            if (m_OllieAudio.clip.name == "rolling" ||
+                m_OllieAudio.clip.name == "rail_grind")
             {
                 m_OllieAudio.Stop();
             }
@@ -180,6 +214,20 @@ public class Player : MonoBehaviour {
             // always accelerate if crouching
             Accelerate();
         }
+        else if (m_isGrinding)
+        {
+            // also always accelerate if grinding
+            Accelerate();
+        }
+
+        if (m_isGrinding)
+        {
+            m_RigidBody.gravityScale = 8.0f;
+        }
+        else
+        {
+            m_RigidBody.gravityScale = 5.0f;
+        }
     }
 
     public void Bail()
@@ -195,9 +243,13 @@ public class Player : MonoBehaviour {
 
         int randIndex = Random.Range(0, m_RandomBailClips.Length - 1);
         m_OllieAudio.clip = m_RandomBailClips[randIndex];
-        m_OllieAudio.pitch = 1.0f;
+        m_OllieAudio.pitch = 1.4f;
         m_OllieAudio.loop = false;
         m_OllieAudio.Play();
+
+        // m_cameraShake.originalPos = Camera.main.transform.localPosition;
+        // m_cameraShake.shakeDuration = 0.25f;
+        // m_cameraShake.shakeAmount = 0.6f;
     }
 
     public void Ollie()
@@ -223,6 +275,7 @@ public class Player : MonoBehaviour {
             int randIndex = Random.Range(0, m_RandomOllieClips.Length - 1);
             m_OllieAudio.clip = m_RandomOllieClips[randIndex];
             m_OllieAudio.loop = false;
+            m_OllieAudio.pitch = 1.0f;
             m_OllieAudio.Play();
 
             int randTrick = Random.Range(0, 9);
@@ -413,15 +466,29 @@ public class Player : MonoBehaviour {
 
         Vector3 posOffset = new Vector3(0, - 0.4f, 0.0f);
 
-        RaycastHit2D hit = Physics2D.Raycast(m_BackWheel.transform.position + posOffset, -Vector2.up, 1.4f);
+        m_isGrinding = false;
+
+        RaycastHit2D hit = Physics2D.Raycast(m_BackWheel.transform.position + posOffset, -Vector2.up, 0.4f);
         if (hit.collider != null && hit.collider.tag != "Skater")
         {
+            if (hit.collider.sharedMaterial && hit.collider.sharedMaterial.name == "rail_material")
+            {
+                m_isGrinding = true;
+            }
+
             m_NumWheelsOnGround++;
         }
 
-        hit = Physics2D.Raycast(m_FrontWheel.transform.position + posOffset, -Vector2.up, 1.4f);
+        hit = Physics2D.Raycast(m_FrontWheel.transform.position + posOffset, -Vector2.up, 0.4f);
         if (hit.collider != null && hit.collider.tag != "Skater")
         {
+            if (!m_isGrinding)
+            {
+                if (hit.collider.sharedMaterial && hit.collider.sharedMaterial.name == "rail_material")
+                {
+                    m_isGrinding = true;
+                }
+            }
             m_NumWheelsOnGround++;
         }
     }
