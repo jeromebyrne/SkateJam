@@ -14,6 +14,7 @@ public class Player : MonoBehaviour {
     const float kMaxSpeedGrinding = 50.0f;
     const float kOlliePower = 23.0f;
     const float kTimeBetweenPushes = 1.5f;
+    const float kGrindSFXDelay = 0.1f;
 
     // public 
     public SkeletonAnimation m_SkeletonAnim;
@@ -36,6 +37,8 @@ public class Player : MonoBehaviour {
     float m_TimeSinceLastPushed = 0.0f;
     CameraShake m_cameraShake = null;
     bool m_isGrinding = false;
+    float m_timeUntilCanPlayGrindSFX = 0.0f;
+    Quaternion targetRotation;
 
     public bool AnyWheelsOnGround()
     {
@@ -67,10 +70,16 @@ public class Player : MonoBehaviour {
         ragdoll = GetComponent<Spine.Unity.Modules.SkeletonRagdoll2D>();
         m_RigidBody = GetComponent<Rigidbody2D>();
         m_cameraShake = Camera.main.GetComponent<CameraShake>();
+        targetRotation = transform.rotation;
     }
 
     public void PushSkateboard()
     {
+        if (m_isGrinding)
+        {
+            return;
+        }
+
         if (m_ragdollEnabled)
         {
             return;
@@ -121,6 +130,8 @@ public class Player : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
+        m_timeUntilCanPlayGrindSFX -= Time.deltaTime;
+
         // minimum velocity
         if (m_RigidBody.transform.up.y > 0.9f && !IsRagdollEnabled())
         {
@@ -149,7 +160,8 @@ public class Player : MonoBehaviour {
             if (m_isGrinding)
             {
                 m_OllieAudio.clip = m_railGrindAudio;
-                m_OllieAudio.loop = true;
+                m_OllieAudio.loop = false;
+                m_timeUntilCanPlayGrindSFX = kGrindSFXDelay;
             }
             else
             {
@@ -162,7 +174,7 @@ public class Player : MonoBehaviour {
         }
         else if (m_NumWheelsOnGround > 0 && m_OllieAudio.isPlaying && !m_ragdollEnabled)
         {
-            if (m_isGrinding)
+            if (m_isGrinding && m_timeUntilCanPlayGrindSFX <= 0.0f)
             {
                 if (m_OllieAudio.clip.name != "rail_grind")
                 {
@@ -254,6 +266,11 @@ public class Player : MonoBehaviour {
 
     public void Ollie()
     {
+        if (m_isGrinding)
+        {
+            m_timeUntilCanPlayGrindSFX = kGrindSFXDelay;
+        }
+
         if (m_ragdollEnabled)
         {
             return;
@@ -297,6 +314,10 @@ public class Player : MonoBehaviour {
                 PlayAnimation("impossible_front_kickflip", false);
             }
             else if (randTrick == 4)
+            {
+                PlayAnimation("kickflip", false);
+            }
+            else if (randTrick == 5)
             {
                 PlayAnimation("kickflip", false);
             }
@@ -506,9 +527,13 @@ public class Player : MonoBehaviour {
 
     void RotateTowardsUp()
     {
-        // Smoothly rotates towards target 
-        var targetPoint = transform.position;
-        var targetRotation = Quaternion.LookRotation(targetPoint - transform.position, Vector3.up);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 3.0f);
+        if (m_isGrinding)
+        {
+            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.time * 1.0f);
+        }
+        else
+        {
+            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.time * 0.0022f);
+        }
     }
 }
