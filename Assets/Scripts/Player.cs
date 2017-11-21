@@ -491,6 +491,12 @@ public class Player : MonoBehaviour {
             }
             m_NumWheelsOnGround++;
         }
+
+        if ((transform.rotation.eulerAngles.z > 70.0f && transform.rotation.eulerAngles.z < 290.0f) || 
+            (transform.rotation.eulerAngles.z < -70.0f && transform.rotation.eulerAngles.z > -290.0f))
+        {
+            Bail();
+        }
     }
 
     public void SetIsCrouching(bool crouching)
