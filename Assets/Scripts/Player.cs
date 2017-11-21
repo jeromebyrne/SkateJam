@@ -162,6 +162,12 @@ public class Player : MonoBehaviour {
             }
         }
 
+        if (m_NumWheelsOnGround < 1 && !m_ragdollEnabled)
+        {
+            // gently stabilize upwards when falling
+            RotateTowardsUp();
+        }
+
         if (m_IsCrouching)
         {
             float timeSincePush = Time.time - m_TimeSinceLastPushed;
@@ -423,5 +429,13 @@ public class Player : MonoBehaviour {
     public void SetIsCrouching(bool crouching)
     {
         m_IsCrouching = crouching;
+    }
+
+    void RotateTowardsUp()
+    {
+        // Smoothly rotates towards target 
+        var targetPoint = transform.position;
+        var targetRotation = Quaternion.LookRotation(targetPoint - transform.position, Vector3.up);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 3.0f);
     }
 }
