@@ -9,12 +9,14 @@ public class MusicManager : MonoBehaviour {
 
     public AudioClip[] m_MenuMusic;
     public AudioClip[] m_LevelMusic;
+    public float m_musicVolume = 1.0f;
 
     private AudioSource m_AudioSourceCurrentMusic;
 
     // Use this for initialization
     void Start () {
         m_AudioSourceCurrentMusic = gameObject.AddComponent<AudioSource>();
+        m_AudioSourceCurrentMusic.volume = m_musicVolume;
 
         m_CurrentLevelMusicIndex = Random.Range(0, m_LevelMusic.Length - 1);
 

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Spine;
 using Spine.Unity;
+using FTRuntime;
+using FTRuntime.Yields;
 
 public class Player : MonoBehaviour {
 
@@ -27,6 +29,8 @@ public class Player : MonoBehaviour {
     public AudioClip m_RollAudio;
     public AudioClip m_railGrindAudio;
     public AudioClip[] m_RandomBailClips;
+    public SwfClip leftWheelSparks = null;
+    public SwfClip rightWheelSparks = null;
 
     // private
     Rigidbody2D m_RigidBody;
@@ -226,19 +230,37 @@ public class Player : MonoBehaviour {
             // always accelerate if crouching
             Accelerate();
         }
-        else if (m_isGrinding)
-        {
-            // also always accelerate if grinding
-            Accelerate();
-        }
 
         if (m_isGrinding)
         {
+            // also always accelerate if grinding
+            Accelerate();
+
             m_RigidBody.gravityScale = 8.0f;
+
+            if (!leftWheelSparks.gameObject.activeSelf)
+            {
+                leftWheelSparks.gameObject.SetActive(true);
+            }
+
+            if (!rightWheelSparks.gameObject.activeSelf)
+            {
+                rightWheelSparks.gameObject.SetActive(true);
+            }
         }
         else
         {
             m_RigidBody.gravityScale = 5.0f;
+
+            if (leftWheelSparks.gameObject.activeSelf)
+            {
+                leftWheelSparks.gameObject.SetActive(false);
+            }
+
+            if (rightWheelSparks.gameObject.activeSelf)
+            {
+                rightWheelSparks.gameObject.SetActive(false);
+            }
         }
     }
 
@@ -533,7 +555,7 @@ public class Player : MonoBehaviour {
         }
         else
         {
-            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.time * 0.0022f);
+            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.time * 0.0025f);
         }
     }
 }
