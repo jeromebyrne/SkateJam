@@ -593,11 +593,22 @@ public class Player : MonoBehaviour {
     {
         if (m_isGrinding)
         {
-            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.time * 1.0f);
+           transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.time * 1.0f);
         }
         else
         {
-            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.time * 0.0025f);
+            Vector3 posOffset = new Vector3(0, -0.4f, 0.0f);
+
+            RaycastHit2D hit = Physics2D.Raycast(m_BackWheel.transform.position + posOffset, -Vector2.up, 12.5f);
+            if (hit.collider != null && hit.collider.GetComponent<Rigidbody2D>() == null && hit.collider.tag != "Skater")
+            {
+                transform.rotation = Quaternion.Lerp(transform.rotation, hit.collider.gameObject.transform.rotation, Time.time * 0.004f);
+            }
+            else
+            {
+                // transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.time * 0.005f);
+            }
+           
         }
     }
 }
