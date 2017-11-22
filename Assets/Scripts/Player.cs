@@ -31,6 +31,7 @@ public class Player : MonoBehaviour {
     public AudioClip[] m_RandomBailClips;
     public SwfClip leftWheelSparks = null;
     public SwfClip rightWheelSparks = null;
+    public SwfClip[] bloodEffects;
 
     // private
     Rigidbody2D m_RigidBody;
@@ -43,6 +44,8 @@ public class Player : MonoBehaviour {
     bool m_isGrinding = false;
     float m_timeUntilCanPlayGrindSFX = 0.0f;
     Quaternion targetRotation;
+    private bool bloodEffectsEnabled = false;
+    private bool bloodEffectsFinihsed = false;
 
     public bool AnyWheelsOnGround()
     {
@@ -75,6 +78,12 @@ public class Player : MonoBehaviour {
         m_RigidBody = GetComponent<Rigidbody2D>();
         m_cameraShake = Camera.main.GetComponent<CameraShake>();
         targetRotation = transform.rotation;
+
+        for (int i = 0; i < bloodEffects.Length; ++i)
+        {
+            bloodEffects[i].gameObject.SetActive(false);
+            bloodEffects[i].GetComponent<SwfClipController>().Stop(true);
+        }
     }
 
     public void PushSkateboard()
@@ -260,6 +269,39 @@ public class Player : MonoBehaviour {
             if (rightWheelSparks.gameObject.activeSelf)
             {
                 rightWheelSparks.gameObject.SetActive(false);
+            }
+        }
+
+        if (m_ragdollEnabled && bloodEffectsEnabled == false)
+        {
+            for (int i = 0; i < bloodEffects.Length; ++i)
+            {
+                bloodEffects[i].gameObject.SetActive(true);
+                bloodEffects[i].GetComponent<SwfClipController>().Play(true);
+            }
+
+            bloodEffectsEnabled = true;
+        }
+
+        if (bloodEffectsEnabled && bloodEffectsFinihsed == false)
+        {
+            int countNotPlaying = 0;
+            for (int i = 0; i < bloodEffects.Length; ++i)
+            {
+                if (!bloodEffects[i].GetComponent<SwfClipController>().isPlaying)
+                {
+                    countNotPlaying++;
+                }
+            }
+
+            if (countNotPlaying == bloodEffects.Length)
+            {
+                for (int i = 0; i < bloodEffects.Length; ++i)
+                {
+                    bloodEffects[i].gameObject.SetActive(false);
+                }
+
+                bloodEffectsFinihsed = true;
             }
         }
     }
