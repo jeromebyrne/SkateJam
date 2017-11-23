@@ -13,7 +13,7 @@ public class Player : MonoBehaviour {
     const float kPushSpeedGrinding = 2.0f;
     const float kMinSpeed = 8.0f;
     const float kMaxSpeed = 40.0f;
-    const float kMaxSpeedGrinding = 50.0f;
+    const float kMaxSpeedGrinding = 60.0f;
     const float kOlliePower = 23.0f;
     const float kTimeBetweenPushes = 1.5f;
     const float kGrindSFXDelay = 0.1f;
@@ -272,17 +272,6 @@ public class Player : MonoBehaviour {
             }
         }
 
-        if (m_ragdollEnabled && bloodEffectsEnabled == false)
-        {
-            for (int i = 0; i < bloodEffects.Length; ++i)
-            {
-                bloodEffects[i].gameObject.SetActive(true);
-                bloodEffects[i].GetComponent<SwfClipController>().Play(true);
-            }
-
-            bloodEffectsEnabled = true;
-        }
-
         if (bloodEffectsEnabled && bloodEffectsFinihsed == false)
         {
             int countNotPlaying = 0;
@@ -306,7 +295,7 @@ public class Player : MonoBehaviour {
         }
     }
 
-    public void Bail()
+    public void Bail(bool showBlood)
     {
         if (m_ragdollEnabled)
         {
@@ -326,6 +315,17 @@ public class Player : MonoBehaviour {
         // m_cameraShake.originalPos = Camera.main.transform.localPosition;
         // m_cameraShake.shakeDuration = 0.25f;
         // m_cameraShake.shakeAmount = 0.6f;
+
+        if (showBlood && m_ragdollEnabled && bloodEffectsEnabled == false)
+        {
+            for (int i = 0; i < bloodEffects.Length; ++i)
+            {
+                bloodEffects[i].gameObject.SetActive(true);
+                bloodEffects[i].GetComponent<SwfClipController>().Play(true);
+            }
+
+            bloodEffectsEnabled = true;
+        }
     }
 
     public void Ollie()
@@ -404,7 +404,7 @@ public class Player : MonoBehaviour {
             return;
         }
 
-        Bail();
+        Bail(true);
     }
 
     void PlayAnimation(string animationName, bool loop)
@@ -577,10 +577,10 @@ public class Player : MonoBehaviour {
             m_NumWheelsOnGround++;
         }
 
-        if ((transform.rotation.eulerAngles.z > 70.0f && transform.rotation.eulerAngles.z < 290.0f) || 
-            (transform.rotation.eulerAngles.z < -70.0f && transform.rotation.eulerAngles.z > -290.0f))
+        if ((transform.rotation.eulerAngles.z > 90.0f && transform.rotation.eulerAngles.z < 270.0f) || 
+            (transform.rotation.eulerAngles.z < -90.0f && transform.rotation.eulerAngles.z > -270.0f))
         {
-            Bail();
+            Bail(false);
         }
     }
 
@@ -599,14 +599,14 @@ public class Player : MonoBehaviour {
         {
             Vector3 posOffset = new Vector3(0, -0.4f, 0.0f);
 
-            RaycastHit2D hit = Physics2D.Raycast(m_BackWheel.transform.position + posOffset, -Vector2.up, 16.5f);
+            RaycastHit2D hit = Physics2D.Raycast(m_BackWheel.transform.position + posOffset, -Vector2.up, 7.5f);
             if (hit.collider != null && hit.collider.GetComponent<Rigidbody2D>() == null && hit.collider.tag != "Skater")
             {
-                transform.rotation = Quaternion.Lerp(transform.rotation, hit.collider.gameObject.transform.rotation, Time.time * 0.007f);
+                transform.rotation = Quaternion.Lerp(transform.rotation, hit.collider.gameObject.transform.rotation, Time.time * 0.005f);
             }
             else
             {
-                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.time * 0.002f);
+                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.time * 0.001f);
             }
         }
     }
