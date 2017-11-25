@@ -15,7 +15,7 @@ public class Player : MonoBehaviour {
     const float kMaxSpeed = 40.0f;
     const float kMaxSpeedGrinding = 60.0f;
     const float kOlliePower = 23.0f;
-    const float kTimeBetweenPushes = 1.5f;
+    const float kTimeBetweenPushes = 2.5f;
     const float kGrindSFXDelay = 0.1f;
 
     // public 
@@ -23,6 +23,8 @@ public class Player : MonoBehaviour {
     public WheelJoint2D m_BackWheel;
     public WheelJoint2D m_FrontWheel;
     public AudioSource m_OllieAudio;
+    public AudioSource m_rollingAudioSource;
+    public AudioSource m_PushAudio;
     public BoxCollider2D m_BailCollider;
     public AudioClip[] m_RandomOllieClips;
     public AudioClip[] m_RandomLandClips;
@@ -105,6 +107,8 @@ public class Player : MonoBehaviour {
 
         PlayAnimation("push", false);
 
+        m_PushAudio.Play();
+
         m_TimeSinceLastPushed = Time.time;
     }
 
@@ -166,58 +170,62 @@ public class Player : MonoBehaviour {
         UpdateCenterOfMass();
         UpdateBoundingBox();
 
-        if (m_NumWheelsOnGround > 0 && !m_OllieAudio.isPlaying && m_RigidBody.velocity.x > 0.0f && !m_ragdollEnabled)
+        if (m_NumWheelsOnGround > 0 && !m_rollingAudioSource.isPlaying && m_RigidBody.velocity.x > 0.0f && !m_ragdollEnabled)
         {
-            m_OllieAudio.Stop();
-
             if (m_isGrinding)
             {
-                m_OllieAudio.clip = m_railGrindAudio;
-                m_OllieAudio.loop = false;
+                m_rollingAudioSource.clip = m_railGrindAudio;
+                m_rollingAudioSource.loop = false;
                 m_timeUntilCanPlayGrindSFX = kGrindSFXDelay;
             }
             else
             {
-                m_OllieAudio.clip = m_RollAudio;
-                m_OllieAudio.loop = true;
+                m_rollingAudioSource.clip = m_RollAudio;
+                m_rollingAudioSource.loop = true;
             }
 
-            m_OllieAudio.Play();
+            m_rollingAudioSource.Play();
 
         }
-        else if (m_NumWheelsOnGround > 0 && m_OllieAudio.isPlaying && !m_ragdollEnabled)
+        else if (m_NumWheelsOnGround > 0 && m_rollingAudioSource.isPlaying && !m_ragdollEnabled)
         {
             if (m_isGrinding && m_timeUntilCanPlayGrindSFX <= 0.0f)
             {
-                if (m_OllieAudio.clip.name != "rail_grind")
+                if (m_rollingAudioSource.clip.name != "rail_grind")
                 {
-                    m_OllieAudio.Stop();
-                    m_OllieAudio.clip = m_railGrindAudio;
-                    m_OllieAudio.loop = true;
-                    m_OllieAudio.Play();
+                    m_rollingAudioSource.Stop();
+                    m_rollingAudioSource.clip = m_railGrindAudio;
+                    m_rollingAudioSource.loop = true;
+                    m_rollingAudioSource.Play();
                 }
             }
             else
             {
-                // TODO: play rolling if grind is playing
+                if (m_rollingAudioSource.clip.name != "rolling")
+                {
+                    m_rollingAudioSource.Stop();
+                    m_rollingAudioSource.clip = m_RollAudio;
+                    m_rollingAudioSource.loop = true;
+                    m_rollingAudioSource.Play();
+                }
             }
 
             // set the speed based on the velocity of the player
             float percent = m_RigidBody.velocity.x / (m_isGrinding ? kMaxSpeedGrinding : kMaxSpeed);
 
-            if (percent < 0.5f)
+            if (percent < 0.4f)
             {
-                percent = 0.5f;
+                percent = 0.4f;
             }
 
-            m_OllieAudio.pitch = percent;
+            m_rollingAudioSource.pitch = percent;
         }
         else if (m_NumWheelsOnGround == 0 || m_RigidBody.velocity.x <= 0.0f || m_ragdollEnabled)
         {
-            if (m_OllieAudio.clip.name == "rolling" ||
-                m_OllieAudio.clip.name == "rail_grind")
+            if (m_rollingAudioSource.clip.name == "rolling" ||
+                m_rollingAudioSource.clip.name == "rail_grind")
             {
-                m_OllieAudio.Stop();
+                m_rollingAudioSource.Stop();
             }
         }
 
