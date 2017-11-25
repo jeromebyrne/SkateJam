@@ -602,11 +602,11 @@ public class Player : MonoBehaviour {
             RaycastHit2D hit = Physics2D.Raycast(m_BackWheel.transform.position + posOffset, -Vector2.up, 7.5f);
             if (hit.collider != null && hit.collider.GetComponent<Rigidbody2D>() == null && hit.collider.tag != "Skater")
             {
-                transform.rotation = Quaternion.Lerp(transform.rotation, hit.collider.gameObject.transform.rotation, Time.time * 0.005f);
+                transform.rotation = Quaternion.Lerp(transform.rotation, hit.collider.gameObject.transform.rotation, Time.time * 0.0045f);
             }
             else
             {
-                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.time * 0.001f);
+                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.time * 0.00075f);
             }
         }
     }
