@@ -4,10 +4,8 @@ using UnityEngine;
 
 public class MusicManager : MonoBehaviour {
 
-    private int m_CurrentMenuMusicIndex = -1;
     private int m_CurrentLevelMusicIndex = -1;
 
-    public AudioClip[] m_MenuMusic;
     public AudioClip[] m_LevelMusic;
     public float m_musicVolume = 1.0f;
 

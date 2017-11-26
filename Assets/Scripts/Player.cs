@@ -367,27 +367,27 @@ public class Player : MonoBehaviour {
             m_OllieAudio.pitch = 1.0f;
             m_OllieAudio.Play();
 
-            int randTrick = Random.Range(0, 20);
+            int randTrick = Random.Range(0, 50);
 
-            if (randTrick == 0)
+            if (randTrick < 16)
+            {
+                PlayAnimation("kickflip", false);
+            }
+            else if (randTrick == 16)
             {
                 PlayAnimation("impossible", false);
             }
-            else if (randTrick == 1)
+            else if (randTrick == 17)
             {
                 PlayAnimation("impossible_front", false);
             }
-            else if (randTrick == 2)
+            else if (randTrick == 18)
             {
                 PlayAnimation("impossible_kickflip", false);
             }
-            else if (randTrick == 3)
+            else if (randTrick == 19)
             {
                 PlayAnimation("impossible_front_kickflip", false);
-            }
-            else if (randTrick == 4 || randTrick == 5 || randTrick == 6 || randTrick == 7)
-            {
-                PlayAnimation("kickflip", false);
             }
             else
             {

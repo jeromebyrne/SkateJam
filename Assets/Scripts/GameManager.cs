@@ -12,10 +12,13 @@ public class GameManager : MonoBehaviour {
 
     // private
     private Player m_Player;
+    private Resetable[] m_Resetables;
 
     // Use this for initialization
     void Start () {
         ResetPlayer();
+
+        m_Resetables = GameObject.FindObjectsOfType<Resetable>();
     }
 	
 	// Update is called once per frame
@@ -60,11 +63,21 @@ public class GameManager : MonoBehaviour {
             {
                 ResetPlayer();
             }
+
+            ResetObjects();
         }
     }
 
     public void QuitToDesktop()
     {
         Application.Quit();
+    }
+
+    private void ResetObjects()
+    {
+        foreach (var r in m_Resetables)
+        {
+            r.ResetAll();
+        }
     }
 }
