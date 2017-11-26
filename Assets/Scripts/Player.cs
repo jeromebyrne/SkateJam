@@ -610,7 +610,7 @@ public class Player : MonoBehaviour {
             }
             else
             {
-                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.time * 0.00075f);
+                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.time * 0.00095f);
             }
         }
     }
