@@ -447,7 +447,7 @@ public class Player : MonoBehaviour {
             m_RigidBody.gravityScale = 0.005f;
 
             ragdoll.rootMass = 0.0f;
-            ragdoll.RootRigidbody.gravityScale = -1.25f;
+            ragdoll.RootRigidbody.gravityScale = -1.1f;
 
             if (m_OllieAudio.isPlaying)
             {
