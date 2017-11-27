@@ -148,8 +148,7 @@ public class Player : MonoBehaviour {
         return m_ragdollEnabled;
     }
 
-    // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         m_timeUntilCanPlayGrindSFX -= Time.deltaTime;
 
@@ -676,11 +675,11 @@ public class Player : MonoBehaviour {
             RaycastHit2D hit = Physics2D.Raycast(m_BackWheel.transform.position + posOffset, -Vector2.up, 9.5f);
             if (hit.collider != null && hit.collider.GetComponent<Rigidbody2D>() == null && hit.collider.tag != "Skater")
             {
-                transform.rotation = Quaternion.Lerp(transform.rotation, hit.collider.gameObject.transform.rotation, Time.time * 0.0020f);
+                transform.rotation = Quaternion.Slerp(transform.rotation, hit.collider.gameObject.transform.rotation, Time.deltaTime * 4.0f);
             }
             else
             {
-                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.time * 0.001f);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 2.0f);
             }
         }
     }
