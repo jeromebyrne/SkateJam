@@ -17,6 +17,8 @@ public class Player : MonoBehaviour {
     const float kOlliePower = 23.0f;
     const float kTimeBetweenPushes = 2.5f;
     const float kGrindSFXDelay = 0.1f;
+    const float kMinSpeedInWater = 4.0f;
+ 
 
     // public 
     public SkeletonAnimation m_SkeletonAnim;
@@ -25,6 +27,7 @@ public class Player : MonoBehaviour {
     public AudioSource m_OllieAudio;
     public AudioSource m_rollingAudioSource;
     public AudioSource m_PushAudio;
+    public AudioSource m_splashAudioSource;
     public BoxCollider2D m_BailCollider;
     public AudioClip[] m_RandomOllieClips;
     public AudioClip[] m_RandomLandClips;
@@ -48,6 +51,7 @@ public class Player : MonoBehaviour {
     Quaternion targetRotation;
     private bool bloodEffectsEnabled = false;
     private bool bloodEffectsFinihsed = false;
+    bool isInWater = false;
 
     public bool AnyWheelsOnGround()
     {
@@ -150,12 +154,15 @@ public class Player : MonoBehaviour {
         m_timeUntilCanPlayGrindSFX -= Time.deltaTime;
 
         // minimum velocity
-        if (m_RigidBody.transform.up.y > 0.9f && !IsRagdollEnabled())
+        if (!isInWater)
         {
-            if (m_RigidBody.velocity.sqrMagnitude < kMinSpeed * kMinSpeed)
+            if (m_RigidBody.transform.up.y > 0.9f && !IsRagdollEnabled())
             {
-                Vector2 newVel = m_RigidBody.transform.right * kMinSpeed;
-                m_RigidBody.velocity = newVel;
+                if (m_RigidBody.velocity.sqrMagnitude < kMinSpeed * kMinSpeed)
+                {
+                    Vector2 newVel = m_RigidBody.transform.right * kMinSpeed;
+                    m_RigidBody.velocity = newVel;
+                }
             }
         }
 
@@ -235,7 +242,7 @@ public class Player : MonoBehaviour {
             RotateTowardsUp();
         }
 
-        if (m_IsCrouching)
+        if (m_IsCrouching && !m_ragdollEnabled)
         {
             float timeSincePush = Time.time - m_TimeSinceLastPushed;
 
@@ -248,7 +255,7 @@ public class Player : MonoBehaviour {
             Accelerate();
         }
 
-        if (m_isGrinding)
+        if (m_isGrinding && !m_ragdollEnabled)
         {
             // also always accelerate if grinding
             Accelerate();
@@ -265,7 +272,7 @@ public class Player : MonoBehaviour {
                 rightWheelSparks.gameObject.SetActive(true);
             }
         }
-        else
+        else if (!m_ragdollEnabled)
         {
             m_RigidBody.gravityScale = 5.0f;
 
@@ -312,7 +319,15 @@ public class Player : MonoBehaviour {
 
         ragdoll.Apply();
         m_ragdollEnabled = true;
-        ragdoll.RootRigidbody.velocity = new Vector2(m_RigidBody.velocity.x * 1.5f, 10);
+
+        if (!isInWater)
+        {
+            ragdoll.RootRigidbody.velocity = new Vector2(m_RigidBody.velocity.x * 1.5f, 10);
+        }
+        else
+        {
+            ragdoll.RootRigidbody.velocity = new Vector2(m_RigidBody.velocity.x * 0.1f, -25);
+        }
 
         int randIndex = Random.Range(0, m_RandomBailClips.Length - 1);
         m_OllieAudio.clip = m_RandomBailClips[randIndex];
@@ -408,8 +423,55 @@ public class Player : MonoBehaviour {
             return;
         }
 
-        Bail(true);
+        if (collision.tag == "Water")
+        {
+            isInWater = true;
+            m_RigidBody.velocity = new Vector2(m_RigidBody.velocity.x * 0.00f, m_RigidBody.velocity.y * 0.25f);
+            m_OllieAudio.Stop();
+            m_splashAudioSource.Play();
+            Bail(false);
+        }
+        else
+        {
+            Bail(true);
+        }
     }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.tag == "Water")
+        {
+            isInWater = true;
+
+            m_RigidBody.mass = 10.01f;
+            m_RigidBody.gravityScale = 0.005f;
+
+            ragdoll.rootMass = 0.0f;
+            ragdoll.RootRigidbody.gravityScale = -1.25f;
+
+            if (m_OllieAudio.isPlaying)
+            {
+                m_OllieAudio.Stop();
+            }
+
+            m_RigidBody.angularDrag = 0.075f;
+            ragdoll.RootRigidbody.angularDrag = 0.1f;
+        }
+    }
+
+    /*
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.tag == "Water")
+        {
+            m_RigidBody.mass = 10.01f;
+            m_RigidBody.gravityScale = 4.0f;
+            // m_RigidBody.velocity = new Vector2(m_RigidBody.velocity.x * 0.01f, m_RigidBody.velocity.y * 0.05f);
+            ragdoll.RootRigidbody.gravityScale = 4.01f;
+            ragdoll.rootMass = 15.0f;
+        }
+    }
+    */
 
     void PlayAnimation(string animationName, bool loop)
     {
@@ -603,14 +665,14 @@ public class Player : MonoBehaviour {
         {
             Vector3 posOffset = new Vector3(0, -0.4f, 0.0f);
 
-            RaycastHit2D hit = Physics2D.Raycast(m_BackWheel.transform.position + posOffset, -Vector2.up, 7.5f);
+            RaycastHit2D hit = Physics2D.Raycast(m_BackWheel.transform.position + posOffset, -Vector2.up, 9.5f);
             if (hit.collider != null && hit.collider.GetComponent<Rigidbody2D>() == null && hit.collider.tag != "Skater")
             {
-                transform.rotation = Quaternion.Lerp(transform.rotation, hit.collider.gameObject.transform.rotation, Time.time * 0.0045f);
+                transform.rotation = Quaternion.Lerp(transform.rotation, hit.collider.gameObject.transform.rotation, Time.time * 0.0035f);
             }
             else
             {
-                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.time * 0.00095f);
+                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.time * 0.0010f);
             }
         }
     }
