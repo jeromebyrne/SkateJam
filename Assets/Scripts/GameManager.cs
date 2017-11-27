@@ -102,13 +102,18 @@ public class GameManager : MonoBehaviour {
         }
         else if (Input.GetMouseButtonUp(2))
         {
-            if (m_Player)
-            {
-                ResetPlayer();
-            }
-
-            ResetObjects();
+            ResetSession();
         }
+    }
+
+    public void ResetSession()
+    {
+        if (m_Player)
+        {
+            ResetPlayer();
+        }
+
+        ResetObjects();
     }
 
     public void QuitToDesktop()
