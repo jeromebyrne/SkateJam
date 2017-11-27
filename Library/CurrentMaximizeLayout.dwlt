@@ -20,10 +20,10 @@ MonoBehaviour:
     y: 30
     width: 2048
     height: 1019
-  m_MinSize: {x: 909, y: 350}
-  m_MaxSize: {x: 22004, y: 14000}
+  m_MinSize: {x: 911, y: 371}
+  m_MaxSize: {x: 22006, y: 14021}
   vertical: 1
-  controlID: 137580
+  controlID: 143641
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -122,10 +122,10 @@ MonoBehaviour:
     y: 0
     width: 2048
     height: 789
-  m_MinSize: {x: 909, y: 250}
-  m_MaxSize: {x: 22004, y: 10000}
+  m_MinSize: {x: 911, y: 250}
+  m_MaxSize: {x: 22006, y: 10000}
   vertical: 0
-  controlID: 137581
+  controlID: 143642
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -189,18 +189,18 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 0
     m_Folders:
-    - Assets/Prefabs
+    - Assets/Scripts
   m_ViewMode: 1
   m_StartGridSize: 16
   m_LastFolders:
-  - Assets/Prefabs
+  - Assets/Scripts
   m_LastFoldersGridSize: 16
   m_LastProjectPath: C:\Users\jerom\Documents\git\SkateJam
   m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 92290000
-    m_LastClickedID: 10642
+    m_SelectedIDs: 062e0000
+    m_LastClickedID: 11782
     m_ExpandedIDs: 000000005c29000092290000ae2a0000e62b00008c2c0000ee2d00003e33000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -254,8 +254,8 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 484fd2ff
-    m_LastClickedInstanceID: -2994360
+    m_SelectedInstanceIDs: cc300000
+    m_LastClickedInstanceID: 12492
     m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: 4a2a0000d226000000000000e22a0000
     m_RenameOverlay:
@@ -336,10 +336,10 @@ MonoBehaviour:
     width: 245
     height: 768
   m_TreeViewState:
-    scrollPos: {x: 0, y: 1585}
-    m_SelectedIDs: 484fd2ff
-    m_LastClickedID: -2994360
-    m_ExpandedIDs: 4610d3ff5624d4ffda2ad5ff68c9d5ff3616d7ff3890d8ff76dbd8ff7ae9d8ffc030daff60cadcff7c2bddffcc8fdfff808ee4ff48e9e5ff6674e6ff3e0ae7ff78dbeaff2cddecff8c5cedffa4c4f0ff94cff1ff18d8f2ff26a9f4ffa8bbf7ff0603faffc4f5fffffef9ffffa6fbffff000000002e2f0000a8300000
+    scrollPos: {x: 0, y: 0}
+    m_SelectedIDs: cc300000
+    m_LastClickedID: 12492
+    m_ExpandedIDs: b8e9d0ff4610d3ff5624d4ffda2ad5ff68c9d5ff3616d7ff3890d8ff76dbd8ff7ae9d8ffc030daff60cadcffcc8fdfff808ee4ff48e9e5ff6674e6ff3e0ae7ff78dbeaff2cddecff8c5cedffa4c4f0ff94cff1ff18d8f2ff26a9f4ffa8bbf7ff0603faffc4f5fffffef9ffffa6fbffff000000002e2f0000a8300000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -416,14 +416,14 @@ MonoBehaviour:
     width: 1168
     height: 768
   m_SceneLighting: 1
-  lastFramingTime: 112795.26905947174
+  lastFramingTime: 115688.8987223
   m_2DMode: 1
   m_isRotationLocked: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 2094.2678, y: -107.560394, z: -6.8452053}
+    m_Target: {x: 3624.6633, y: -117.767426, z: -1.3045741}
     speed: 2
-    m_Value: {x: 2094.2678, y: -107.560394, z: -6.8452053}
+    m_Value: {x: 3624.6633, y: -117.767426, z: -1.3045741}
   m_RenderMode: 0
   m_ValidateTrueMetals: 0
   m_SceneViewState:
@@ -450,9 +450,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 693.9563
+    m_Target: 155.89891
     speed: 2
-    m_Value: 693.9563
+    m_Value: 155.89891
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -508,8 +508,8 @@ MonoBehaviour:
     y: 0
     width: 277
     height: 789
-  m_MinSize: {x: 275, y: 50}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 277, y: 71}
+  m_MaxSize: {x: 4002, y: 4021}
   m_ActualView: {fileID: 12}
   m_Panes:
   - {fileID: 12}
@@ -566,8 +566,8 @@ MonoBehaviour:
     y: 789
     width: 2048
     height: 230
-  m_MinSize: {x: 100, y: 100}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 100, y: 121}
+  m_MaxSize: {x: 4000, y: 4021}
   m_ActualView: {fileID: 14}
   m_Panes:
   - {fileID: 14}
