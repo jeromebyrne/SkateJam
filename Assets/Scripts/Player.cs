@@ -430,6 +430,11 @@ public class Player : MonoBehaviour {
             return;
         }
 
+        if (collision.isTrigger && collision.tag != "Water")
+        {
+            return;
+        }
+
         if (collision.tag == "Water")
         {
             isInWater = true;
@@ -453,8 +458,11 @@ public class Player : MonoBehaviour {
             m_RigidBody.mass = 10.01f;
             m_RigidBody.gravityScale = 0.005f;
 
-            ragdoll.rootMass = 0.0f;
-            ragdoll.RootRigidbody.gravityScale = -1.1f;
+            if (ragdoll && ragdoll.RootRigidbody)
+            {
+                ragdoll.rootMass = 0.0f;
+                ragdoll.RootRigidbody.gravityScale = -1.1f;
+            }
 
             if (m_OllieAudio.isPlaying)
             {
