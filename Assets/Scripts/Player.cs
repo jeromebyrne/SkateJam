@@ -317,7 +317,13 @@ public class Player : MonoBehaviour {
             return;
         }
 
+        if (ragdoll == null)
+        {
+            return;
+        }
+        
         ragdoll.Apply();
+        
         m_ragdollEnabled = true;
 
         if (!isInWater)
@@ -668,11 +674,11 @@ public class Player : MonoBehaviour {
             RaycastHit2D hit = Physics2D.Raycast(m_BackWheel.transform.position + posOffset, -Vector2.up, 9.5f);
             if (hit.collider != null && hit.collider.GetComponent<Rigidbody2D>() == null && hit.collider.tag != "Skater")
             {
-                transform.rotation = Quaternion.Lerp(transform.rotation, hit.collider.gameObject.transform.rotation, Time.time * 0.0035f);
+                transform.rotation = Quaternion.Lerp(transform.rotation, hit.collider.gameObject.transform.rotation, Time.time * 0.0012f);
             }
             else
             {
-                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.time * 0.0010f);
+                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.time * 0.0005f);
             }
         }
     }
